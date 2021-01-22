@@ -10,11 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Custom HttpHandler, that can handling related with Task object
- *
- * @author Taeheon Woo
- * @version 1.0
- *
+ * Handle related with Task object
  */
 public class DemoHttpHandler implements HttpHandler {
     private List<Task> tasks = new ArrayList<>();
@@ -32,9 +28,29 @@ public class DemoHttpHandler implements HttpHandler {
 
         System.out.println(method + " " + path);
 
-        String content = new ResponseHandler().handle(method, path, tasks, body);
+        String content = "";
+        int statusCode = Constant.HttpStatusCode.OK;
 
-        exchange.sendResponseHeaders(Constant.ResponseCode.success, content.getBytes().length);
+        try {
+            content = new ResponseHandler().handle(method, path, tasks, body);
+
+            switch (method) {
+                case "POST":
+                    statusCode = Constant.HttpStatusCode.CREATED;
+                    break;
+
+                case "DELETE":
+                    statusCode = Constant.HttpStatusCode.NO_CONTENT;
+                    break;
+            }
+
+        } catch (ResponseHandlingException e) {
+            e.printDescription();
+            content = "";
+            statusCode = Constant.HttpStatusCode.NOT_FOUND;
+        }
+
+        exchange.sendResponseHeaders(statusCode, content.getBytes().length);
 
         OutputStream outputStream = exchange.getResponseBody();
 
