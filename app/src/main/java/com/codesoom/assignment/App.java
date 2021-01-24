@@ -1,6 +1,6 @@
 package com.codesoom.assignment;
 
-import com.sun.net.httpserver.HttpHandler;
+import com.codesoom.assignment.handler.DemoHttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
@@ -13,7 +13,7 @@ public class App {
 
     public static void main(String[] args) {
         try {
-            HttpServer httpServer = HttpServer.create(new InetSocketAddress(Constant.PORT), Constant.BACKLOG);
+            HttpServer httpServer = HttpServer.create(new InetSocketAddress(ServerConfiguration.PORT), ServerConfiguration.BACKLOG);
             httpServer.createContext("/", new DemoHttpHandler());
             httpServer.start();
         } catch (IOException e) {

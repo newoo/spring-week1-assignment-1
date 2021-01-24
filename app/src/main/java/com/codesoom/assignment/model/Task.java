@@ -1,7 +1,7 @@
-package com.codesoom.assignment;
+package com.codesoom.assignment.model;
 
 /**
- * task model, contains id and title
+ * Task model, contains id and title.
  */
 public class Task {
     private Long id;
@@ -21,5 +21,10 @@ public class Task {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    @Override
+    public String toString() {
+        return "Task -> id: " + id + ", title: " + title;
     }
 }

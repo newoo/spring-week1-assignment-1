@@ -1,23 +1,22 @@
 package com.codesoom.assignment;
 
+/**
+ *  define exception related with handling response contents
+ */
 public class ResponseHandlingException extends Exception {
-    enum ErrorCode {
-        WRONG_PATH, UNKNOWN_HTTP_METHOD
-    }
+    private final HttpStatusCode httpStatusCode;
 
-    private final ErrorCode errorCode;
-
-    public ResponseHandlingException(ErrorCode errorCode) {
-        this.errorCode = errorCode;
+    public ResponseHandlingException(HttpStatusCode httpStatusCode) {
+        this.httpStatusCode = httpStatusCode;
     }
 
     public void printDescription() {
-        switch (this.errorCode) {
-            case WRONG_PATH:
-                System.out.println("Wrong URI path");
+        switch (this.httpStatusCode) {
+            case NOT_FOUND:
+                System.out.println("Not Found.");
 
-            case UNKNOWN_HTTP_METHOD:
-                System.out.println("Unknown HTTP method");
+            case METHOD_NOT_ALLOWED:
+                System.out.println("Method Not Allowed.");
         }
     }
 }

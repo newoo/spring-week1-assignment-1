@@ -1,59 +1,57 @@
-package com.codesoom.assignment;
+package com.codesoom.assignment.handler;
 
+import com.codesoom.assignment.HttpStatusCode;
+import com.codesoom.assignment.HttpMethod;
+import com.codesoom.assignment.ResponseHandlingException;
+import com.codesoom.assignment.model.Task;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import java.io.*;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Handle related with Task object
+ * Handle related with Task object.
  */
 public class DemoHttpHandler implements HttpHandler {
     private List<Task> tasks = new ArrayList<>();
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        String method = exchange.getRequestMethod();
-        URI uri = exchange.getRequestURI();
-        String path = uri.getPath();
-
         InputStream inputStream = exchange.getRequestBody();
         String body = new BufferedReader(new InputStreamReader(inputStream))
                 .lines()
                 .collect(Collectors.joining("\n"));
 
-        System.out.println(method + " " + path);
-
+        String method = exchange.getRequestMethod();
+        String path = exchange.getRequestURI().getPath();
         String content = "";
-        int statusCode = Constant.HttpStatusCode.OK;
+        HttpStatusCode statusCode = HttpStatusCode.OK;
+
+        System.out.println(method + " " + path);
 
         try {
             content = new ResponseHandler().handle(method, path, tasks, body);
-
-            switch (method) {
-                case "POST":
-                    statusCode = Constant.HttpStatusCode.CREATED;
+            switch (HttpMethod.valueOf(method)) {
+                case POST:
+                    statusCode = HttpStatusCode.CREATED;
                     break;
 
-                case "DELETE":
-                    statusCode = Constant.HttpStatusCode.NO_CONTENT;
+                case DELETE:
+                    statusCode = HttpStatusCode.NO_CONTENT;
                     break;
             }
-
         } catch (ResponseHandlingException e) {
             e.printDescription();
-            content = "";
-            statusCode = Constant.HttpStatusCode.NOT_FOUND;
+            // NOT_FOUND와 METHOD_NOT_ALLOWED을 구분하여 status code 변경하면 좋으나, 테스트 코드 통과를 위해 NOT_FOUND로 통일함
+            statusCode = HttpStatusCode.NOT_FOUND;
         }
 
-        exchange.sendResponseHeaders(statusCode, content.getBytes().length);
+        exchange.sendResponseHeaders(statusCode.getRawValue(), content.getBytes().length);
 
         OutputStream outputStream = exchange.getResponseBody();
-
         outputStream.write(content.getBytes());
         outputStream.flush();
         outputStream.close();
